@@ -12,18 +12,20 @@ if __name__ == '__main__':
         soup = bs4.BeautifulSoup(response.text)
         feeds = soup.select('.feed-row-wide')
         for feed in feeds:
+            counter += 1
+
             article_id = feed.attrs['articleid']
             if str(article_id).split('_')[0] != '3':
                 continue
 
             title = feed.select('.feed-block-title')[0]
-            counter += 1
             text = title.get_text()
             href = title.select('a')[0].attrs['href']
-            up = feed.select('.price-btn-up .unvoted-wrap')[0].get_text()
-            down = feed.select('.price-btn-down .unvoted-wrap')[0].get_text()
-            print('%d(%s/%s): %s(%s)' % (counter,
-                                         str(up).lstrip().rstrip(),
-                                         down.lstrip().rstrip(),
-                                         text,
-                                         href))
+            up = int(feed.select('.price-btn-up .unvoted-wrap')[0]
+                     .get_text().lstrip().rstrip())
+            down = int(feed.select('.price-btn-down .unvoted-wrap')[0]
+                       .get_text().lstrip().rstrip())
+            if up == 0 or up < down:
+                continue
+
+            print('%d(%s/%s): %s(%s)' % (counter, up, down, text, href))
