@@ -1,7 +1,9 @@
 import sys
-import requests
+
 import bs4
-import headers
+import requests
+
+from common import const
 
 if __name__ == '__main__':
     page_count = int(sys.argv[1]) if len(sys.argv) >= 2 else 10
@@ -9,7 +11,7 @@ if __name__ == '__main__':
     counter = 0
     for page in range(page_count):
         response = requests.get('https://www.smzdm.com/p%d' % page,
-                                headers=headers)
+                                headers=const.HEADERS)
         soup = bs4.BeautifulSoup(response.text)
         feeds = soup.select('.feed-row-wide')
         for feed in feeds:
