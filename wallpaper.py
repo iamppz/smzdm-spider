@@ -14,9 +14,7 @@ if __name__ == '__main__':
         json = demjson.decode(json_str)
         path = json['url']
         print('image: %s' % path)
-        image = requests.get('http://cn.bing.com%s' % path).content
+        image = requests.get('http://%s%s' % (const.DOMAIN_BING, path)).content
         file_name = path[16:]
         with open(file_name, 'wb') as handler:
             handler.write(image)
-
-
