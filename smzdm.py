@@ -1,13 +1,11 @@
 import sys
 import requests
 import bs4
+import headers
 
 if __name__ == '__main__':
     page_count = int(sys.argv[1]) if len(sys.argv) >= 2 else 10
 
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36'
-    }
     counter = 0
     for page in range(page_count):
         response = requests.get('https://www.smzdm.com/p%d' % page,
