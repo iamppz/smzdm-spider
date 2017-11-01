@@ -4,7 +4,7 @@ import demjson
 from common import const
 
 if __name__ == '__main__':
-    resp = requests.get('http://cn.bing.com', headers=const.HEADERS)
+    resp = requests.get('http://%s' % const.DOMAIN_BING, headers=const.HEADERS)
     pattern = re.compile('g_img={(.+?)}')
     match = pattern.search(resp.text)
     print('match group 0: ' + match.group(0))
@@ -15,7 +15,8 @@ if __name__ == '__main__':
         path = json['url']
         print('image: %s' % path)
         image = requests.get('http://cn.bing.com%s' % path).content
-        with open(path[16:], 'wb') as handler:
+        file_name = path[16:]
+        with open(file_name, 'wb') as handler:
             handler.write(image)
 
 

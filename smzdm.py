@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     counter = 0
     for page in range(page_count):
-        response = requests.get('https://www.smzdm.com/p%d' % page,
+        response = requests.get('https://%s/p%d' % (const.DOMAIN_SMZDM, page),
                                 headers=const.HEADERS)
         soup = bs4.BeautifulSoup(response.text)
         feeds = soup.select('.feed-row-wide')
