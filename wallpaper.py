@@ -1,7 +1,28 @@
-import requests
+import ctypes
 import re
+import struct
 import demjson
+import os
+import requests
+
 from common import const
+
+SPI_SETDESKWALLPAPER = 20
+
+
+def is_64_windows():
+    return 'PROGRAMFILES(X86)' in os.environ
+
+
+def get_sys_parameters_info():
+    return ctypes.windll.user32.SystemParametersInfoW if is_64_windows() \
+        else ctypes.windll.user32.SystemParametersInfoA
+
+
+def setWallpaper(path):
+    sys_parameters_info = get_sys_parameters_info()
+    r = sys_parameters_info(SPI_SETDESKWALLPAPER, 0, path, 3)
+
 
 if __name__ == '__main__':
     resp = requests.get('http://%s' % const.DOMAIN_BING, headers=const.HEADERS)
@@ -18,3 +39,4 @@ if __name__ == '__main__':
         file_name = path[16:]
         with open(file_name, 'wb') as handler:
             handler.write(image)
+        setWallpaper('c:/workspace/smzdm-spider/%s' % file_name)
