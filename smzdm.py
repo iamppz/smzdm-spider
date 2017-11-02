@@ -7,15 +7,13 @@ from common import const
 
 if __name__ == '__main__':
     page_count = int(sys.argv[1]) if len(sys.argv) >= 2 else 10
-
-    counter = 0
-    for page in range(page_count):
+    infos = []
+    for page in range(1, 11):
         response = requests.get('https://%s/p%d' % (const.DOMAIN_SMZDM, page),
                                 headers=const.HEADERS)
         soup = bs4.BeautifulSoup(response.text)
         feeds = soup.select('.feed-row-wide')
         for feed in feeds:
-            counter += 1
 
             article_id = feed.attrs['articleid']
             if str(article_id).split('_')[0] != '3':
@@ -31,4 +29,9 @@ if __name__ == '__main__':
             if up == 0 or up < down:
                 continue
 
-            print('%d(%s/%s): %s(%s)' % (counter, up, down, text, href))
+            infos.append((up, '(%s/%s): %s(%s)' % (up, down, text, href)))
+
+        print('Page %d of %d complete.' % (page, page_count))
+
+    for info in sorted(infos, key=lambda item: -item[0]):
+        print(info[1])
