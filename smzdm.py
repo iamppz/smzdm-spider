@@ -7,6 +7,7 @@ from common import const
 
 if __name__ == '__main__':
     page_count = int(sys.argv[1]) if len(sys.argv) >= 2 else 10
+    top = int(sys.argv[2]) if len(sys.argv) >= 3 else 32
     infos = []
     for page in range(1, 11):
         response = requests.get('https://%s/p%d' % (const.DOMAIN_SMZDM, page),
@@ -33,5 +34,5 @@ if __name__ == '__main__':
 
         print('Page %d of %d complete.' % (page, page_count))
 
-    for info in sorted(infos, key=lambda item: -item[0]):
+    for info in sorted(infos, key=lambda item: -item[0])[0: top]:
         print(info[1])
