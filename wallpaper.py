@@ -1,6 +1,5 @@
 import ctypes
 import re
-import struct
 import demjson
 import os
 import requests
@@ -19,9 +18,9 @@ def get_sys_parameters_info():
         else ctypes.windll.user32.SystemParametersInfoA
 
 
-def setWallpaper(path):
+def set_wallpaper(path):
     sys_parameters_info = get_sys_parameters_info()
-    r = sys_parameters_info(SPI_SETDESKWALLPAPER, 0, path, 3)
+    return sys_parameters_info(SPI_SETDESKWALLPAPER, 0, path, 3)
 
 
 if __name__ == '__main__':
@@ -34,9 +33,14 @@ if __name__ == '__main__':
         print('json: %s' % json_str)
         json = demjson.decode(json_str)
         path = json['url']
-        print('image: %s' % path)
-        image = requests.get('http://%s%s' % (const.DOMAIN_BING, path)).content
+        full_url = 'http://%s%s' % (const.DOMAIN_BING, path)
+        print('image url: %s' % full_url)
+        image = requests.get(full_url).content
         file_name = path[16:]
-        with open(file_name, 'wb') as handler:
+        relative_path = 'wallpaper/%s' % file_name
+        absolute_path = '%s/%s' % (os.getcwd(), relative_path)
+        print('write file to %s' % absolute_path)
+        with open(absolute_path, 'wb') as handler:
             handler.write(image)
-        setWallpaper('c:/workspace/smzdm-spider/%s' % file_name)
+        r = set_wallpaper(absolute_path)
+        print('done')
