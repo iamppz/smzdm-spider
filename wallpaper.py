@@ -24,6 +24,10 @@ def set_wallpaper(path):
 
 
 if __name__ == '__main__':
+    download_path = '%s/wallpaper' % os.getcwd()
+    if not os.path.exists(download_path):
+        os.mkdir(download_path)
+
     resp = requests.get('http://%s' % const.DOMAIN_BING, headers=const.HEADERS)
     pattern = re.compile('g_img={(.+?)}')
     match = pattern.search(resp.text)
@@ -32,11 +36,11 @@ if __name__ == '__main__':
         json_str = match.group(0)[6:]
         print('json: %s' % json_str)
         json = demjson.decode(json_str)
-        path = json['url']
-        full_url = 'http://%s%s' % (const.DOMAIN_BING, path)
+        download_path = json['url']
+        full_url = 'http://%s%s' % (const.DOMAIN_BING, download_path)
         print('image url: %s' % full_url)
         image = requests.get(full_url).content
-        file_name = path[16:]
+        file_name = download_path[16:]
         relative_path = 'wallpaper/%s' % file_name
         absolute_path = '%s/%s' % (os.getcwd(), relative_path)
         print('write file to %s' % absolute_path)
