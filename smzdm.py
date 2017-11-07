@@ -10,7 +10,7 @@ if __name__ == '__main__':
     top = int(sys.argv[2]) if len(sys.argv) >= 3 else 32
     infos = []
     for page in range(1, page_count + 1):
-        response = requests.get('https://%s/p%d' % (const.DOMAIN_SMZDM, page),
+        response = requests.get('https://%s/p%d' % (const.DOMAIN, page),
                                 headers=const.HEADERS)
         soup = bs4.BeautifulSoup(response.text)
         feeds = soup.select('.feed-row-wide')
