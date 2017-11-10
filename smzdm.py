@@ -2,6 +2,7 @@ import sys
 import threading
 import bs4
 import requests
+import webbrowser
 from multiprocessing.dummy import Pool as ThreadPool
 
 from common import const
@@ -20,17 +21,35 @@ class SMZDMSpider:
         self.keyword = kw
 
     def run(self):
-        pool = ThreadPool(4)
+        pool = ThreadPool(8)
         results = pool.map(
             lambda page: self.get_info('https://%s/p%d' % (const.DOMAIN, page)),
             range(1, self.page_count + 1))
         infos = [item for sublist in results for item in sublist]
+        infos = [info for info in infos if self.keyword in info[2]]
+        top_n = sorted(infos, key=lambda item: -item[0])[0: self.top]
 
-        for info in sorted(infos, key=lambda item: -item[0])[0: self.top]:
-            if self.keyword not in info[1]:
-                continue
+        print('\n')
+        for idx, info in enumerate(top_n):
+            temp = list(info)
+            temp.insert(0, idx)
+            print('%s(%s/%s): %s(%s)' % tuple(temp))
 
-            print(info[1])
+        if len(top_n) > 0:
+            while True:
+                string = input('\nPress index to open URL(q to quit):\n')
+                if string.isnumeric():
+                    index = int(string)
+                    if 0 <= index < len(top_n):
+                        webbrowser.open(top_n[index][3])
+                    else:
+                        print('Error input.')
+                else:
+                    if string == 'q':
+                        print('Bye!')
+                        break
+                    else:
+                        print('Error input.')
 
     def get_info(self, url):
         result = []
@@ -52,12 +71,14 @@ class SMZDMSpider:
             if up == 0 or up < down:
                 continue
 
-            result.append((up, '(%s/%s): %s(%s)' % (up, down, text, href)))
+            result.append((up, down, text, href))
+            # result.append((up, '(%s/%s): %s(%s)' % (up, down, text, href)))
 
         with self.threadLock:
             self.counter += 1
 
-        print('(%d/%d)fetch complete: %s' % (self.counter, self.page_count, url))
+        print(
+            '(%d/%d)fetch complete: %s' % (self.counter, self.page_count, url))
         return result
 
 
