@@ -32,14 +32,14 @@ class SMZDMSpider:
         print('\n')
         for idx, info in enumerate(top_n):
             temp = list(info)
-            temp.insert(0, idx)
+            temp.insert(0, idx + 1)
             print('%s(%s/%s): %s(%s)' % tuple(temp))
 
         if len(top_n) > 0:
             while True:
                 string = input('\nPress index to open URL(q to quit):\n')
                 if string.isnumeric():
-                    index = int(string)
+                    index = int(string) - 1
                     if 0 <= index < len(top_n):
                         webbrowser.open(top_n[index][3])
                     else:
@@ -54,7 +54,7 @@ class SMZDMSpider:
     def get_info(self, url):
         result = []
         response = requests.get(url, headers=const.HEADERS)
-        soup = bs4.BeautifulSoup(response.text)
+        soup = bs4.BeautifulSoup(response.text, 'html.parser')
         feeds = soup.select('.feed-row-wide')
         for feed in feeds:
             article_id = feed.attrs['articleid']
