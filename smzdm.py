@@ -21,7 +21,7 @@ class SMZDMSpider:
         self.keyword = kw
 
     def run(self):
-        pool = ThreadPool(8)
+        pool = ThreadPool(page_count if page_count <= 32 else 32)
         results = pool.map(
             lambda page: self.get_info('https://%s/p%d' % (const.DOMAIN, page)),
             range(1, self.page_count + 1))
@@ -76,9 +76,7 @@ class SMZDMSpider:
 
         with self.threadLock:
             self.counter += 1
-
-        print(
-            '(%d/%d)fetch complete: %s' % (self.counter, self.page_count, url))
+            print('(%d/%d)fetch complete: %s' % (self.counter, self.page_count, url))
         return result
 
 
