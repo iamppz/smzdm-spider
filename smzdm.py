@@ -3,6 +3,7 @@ import threading
 import bs4
 import requests
 import webbrowser
+import yaml
 from multiprocessing.dummy import Pool as ThreadPool
 
 from common import const
@@ -21,7 +22,7 @@ class SMZDMSpider:
         self.keyword = kw
 
     def run(self):
-        pool = ThreadPool(page_count if page_count <= 32 else 32)
+        pool = ThreadPool(page_count if page_count <= 16 else 16)
         results = pool.map(
             lambda page: self.get_info('https://%s/p%d' % (const.DOMAIN, page)),
             range(1, self.page_count + 1))
@@ -52,6 +53,7 @@ class SMZDMSpider:
                         print('Error input.')
 
     def get_info(self, url):
+        print('start fetching %s' % url)
         result = []
         response = requests.get(url, headers=const.HEADERS)
         soup = bs4.BeautifulSoup(response.text, 'html.parser')
@@ -72,7 +74,6 @@ class SMZDMSpider:
                 continue
 
             result.append((up, down, text, href))
-            # result.append((up, '(%s/%s): %s(%s)' % (up, down, text, href)))
 
         with self.threadLock:
             self.counter += 1
@@ -81,7 +82,10 @@ class SMZDMSpider:
 
 
 if __name__ == '__main__':
-    page_count = int(sys.argv[1]) if len(sys.argv) >= 2 else 10
-    top = int(sys.argv[2]) if len(sys.argv) >= 3 else 10
+    f = open('config.yaml')
+    x = yaml.load(f)
+
+    page_count = int(sys.argv[1]) if len(sys.argv) >= 2 else int(x['default']['page-count'])
+    top = int(sys.argv[2]) if len(sys.argv) >= 3 else int(x['default']['top'])
     keyword = sys.argv[3] if len(sys.argv) >= 4 else ''
     SMZDMSpider(page_count, top, keyword).run()
